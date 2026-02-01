@@ -7,6 +7,7 @@ use App\Models\Employee;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
+use PhpParser\Node\Stmt\TryCatch;
 
 class EmployeeController extends Controller
 {
@@ -15,7 +16,7 @@ class EmployeeController extends Controller
      */
     public function index()
     {
-        $employee= Employee::all();
+        $employee = Employee::all();
 
         return response()->json([
             'status' => true,
@@ -29,8 +30,9 @@ class EmployeeController extends Controller
      */
     public function store(StoreEmployeeRequest $request)
     {
+
         $employee = Employee::create($request->validated());
-        
+
         return response()->json([
             'status' => true,
             'message' => 'Employee created successfully',
@@ -41,16 +43,30 @@ class EmployeeController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
-        //
+        $employee = Employee::find($id);
+
+        if (!$employee) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Employee not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Employee fetched successfully',
+            'data' => $employee,
+        ], 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateEmployeeRequest $request, Employee $employee)
+    public function update(UpdateEmployeeRequest $request, $id)
     {
+        $employee = Employee::withTrashed()->findOrFail($id);
         $employee->update($request->validated());
 
         return response()->json([
@@ -58,7 +74,6 @@ class EmployeeController extends Controller
             'message' => 'Employee updated successfully',
             'data' => $employee,
         ], 200);
-
     }
 
     /**
@@ -72,6 +87,19 @@ class EmployeeController extends Controller
             'status' => true,
             'message' => 'Employee deleted successfully',
         ], 200);
+    }
 
+    public function forceDelete($id)
+    {
+
+        //find employee incluing soft delete once
+        $employee = Employee::withTrashed()->findOrFail($id);
+
+        $employee->forceDelete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Employee permanently deleted',
+        ], 200);
     }
 }
