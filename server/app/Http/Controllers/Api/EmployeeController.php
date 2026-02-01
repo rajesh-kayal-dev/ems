@@ -13,7 +13,6 @@ class EmployeeController extends Controller
     public function index()
     {
         return response()->json(['message' => 'Employee index']);
-        
     }
 
     /**
