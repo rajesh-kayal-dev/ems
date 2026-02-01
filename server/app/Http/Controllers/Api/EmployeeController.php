@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreEmployeeRequest;
 
 class EmployeeController extends Controller
 {
@@ -16,18 +17,24 @@ class EmployeeController extends Controller
         $employee= Employee::all();
 
         return response()->json([
-            'ststus' =>true,
-            'message'=> 'Employee fetch successful',
+            'status' => true,
+            'message' => 'Employee fetch successful',
             'data' => $employee,
-        ],200);
+        ], 200);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreEmployeeRequest $request)
     {
+        $employee = Employee::create($request->validated());
         
+        return response()->json([
+            'status' => true,
+            'message' => 'Employee created successfully',
+            'data' => $employee,
+        ], 201);
     }
 
     /**
