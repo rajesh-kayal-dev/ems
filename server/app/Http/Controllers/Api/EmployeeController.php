@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreEmployeeRequest;
+use App\Http\Requests\UpdateEmployeeRequest;
 
 class EmployeeController extends Controller
 {
@@ -48,9 +49,16 @@ class EmployeeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateEmployeeRequest $request, Employee $employee)
     {
-        
+        $employee->update($request->validated());
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Employee updated successfully',
+            'data' => $employee,
+        ], 200);
+
     }
 
     /**
